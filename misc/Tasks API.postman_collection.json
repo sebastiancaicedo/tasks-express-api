@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "4ca33510-7cbf-4c09-b1d2-e73e37e3d686",
+		"name": "Tasks API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all tasks",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/{{API_VERSION}}/tasks/",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"{{API_VERSION}}",
+						"tasks",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get tasks by id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/{{API_VERSION}}/tasks/3776ea6f-6794-4e2e-b153-839ea25db1e2",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"{{API_VERSION}}",
+						"tasks",
+						"3776ea6f-6794-4e2e-b153-839ea25db1e2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create task",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/{{API_VERSION}}/tasks/",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"{{API_VERSION}}",
+						"tasks",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update task by id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"My Desc\",\r\n    \"author\": \"Luis\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/{{API_VERSION}}/tasks/2913feaf-9099-4af4-90d4-593e155bddba",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"{{API_VERSION}}",
+						"tasks",
+						"2913feaf-9099-4af4-90d4-593e155bddba"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete task by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/{{API_VERSION}}/tasks/2913feaf-9099-4af4-90d4-593e155bddba",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"{{API_VERSION}}",
+						"tasks",
+						"2913feaf-9099-4af4-90d4-593e155bddba"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
