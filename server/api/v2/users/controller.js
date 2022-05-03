@@ -87,6 +87,7 @@ exports.update = async (req, res, next) => {
     try {
       const data = await Model.findByIdAndUpdate(userFound.id, userUpdated, {
         new: true,
+        runValidators: true,
       });
       res.json({
         data,
@@ -105,7 +106,7 @@ exports.activation = async (req, res, next) => {
   if (userFound) {
     const { enabled = userFound.enabled } = body;
     if (enabled === userFound.enabled) {
-      res.json({
+      return res.json({
         userFound,
       });
     }

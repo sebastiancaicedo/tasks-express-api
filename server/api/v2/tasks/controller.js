@@ -92,6 +92,7 @@ exports.update = async (req, res, next) => {
       const populateFields = Object.getOwnPropertyNames(references).join(' ');
       const data = await Model.findByIdAndUpdate(taskFound.id, taskUpdated, {
         new: true,
+        runValidators: true,
       }).populate(populateFields);
       res.json({
         data,

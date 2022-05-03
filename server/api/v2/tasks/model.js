@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { body } = require('express-validator');
 
 const fields = {
   description: {
@@ -17,8 +18,15 @@ const references = {
   },
 };
 
+const sanitizers = [body('description').escape()];
+
 const task = new mongoose.Schema(Object.assign(fields, references), {
   timestamps: true,
 });
 
-module.exports = { fields, Model: mongoose.model('task', task), references };
+module.exports = {
+  fields,
+  Model: mongoose.model('task', task),
+  references,
+  sanitizers,
+};
