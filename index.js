@@ -1,8 +1,12 @@
 const http = require('http');
 const app = require('./server');
 const config = require('./server/config');
+const dbhanlder = require('./server/dbhandler');
 
-const { port } = config;
+const { port, dbConfig } = config;
+
+// Connect to db
+dbhanlder.connect(dbConfig);
 
 const httpServer = http.createServer(app);
 

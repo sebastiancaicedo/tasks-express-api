@@ -3,20 +3,16 @@ const express = require('express');
 const router = express.Router();
 
 const controller = require('./controller');
+const { sanitizers } = require('./model');
 
-router.route('/').get(controller.all).post(controller.create);
+router.route('/').get(controller.all).post(sanitizers, controller.create);
 
 router.param('id', controller.findById);
-// router
-//   .route('/:id')
-//   .get(controller.findById)
-//   .put(controller.findById)
-//   .delete(controller.findById);
 
 router
   .route('/:id')
   .get(controller.read)
-  .put(controller.update)
+  .put(sanitizers, controller.update)
   .delete(controller.delete);
 
 module.exports = router;
