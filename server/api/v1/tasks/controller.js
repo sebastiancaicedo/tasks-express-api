@@ -1,6 +1,7 @@
 const fs = require('fs/promises');
 const { v4: uuidv4 } = require('uuid');
 const config = require('./../../../config');
+const { fields } = require('./model');
 
 const { dataFilePath } = config;
 let tasks = [];
@@ -72,10 +73,17 @@ exports.update = async (req, res, next) => {
   const { middleWare = {} } = req;
   const { taskFound } = middleWare;
 
+  const safeFields = Object.getOwnPropertyNames(fields).reduce((obj, key) => {
+    if (key in fields) {
+      obj[key] = body[key];
+    }
+    return obj;
+  }, {});
+
   if (taskFound) {
     const task = {
       ...taskFound,
-      ...body,
+      ...safeFields,
       id: taskFound.id,
       updated: new Date().toUTCString(),
     };
