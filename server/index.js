@@ -1,11 +1,13 @@
 const express = require('express');
 const api = require('./api/v1');
+const api2 = require('./api/v2');
 
 const app = express();
 
 app.use(express.json());
 
 app.use('/api/v1', api);
+app.use('/api/v2', api2);
 
 app.use((req, res, next) => {
   next({
