@@ -1,16 +1,20 @@
-const fs = require('fs');
+const fs = require('fs/promises');
 const { v4: uuidv4 } = require('uuid');
 const config = require('./../../../config');
 
 const { dataFilePath } = config;
 let tasks = [];
 
-exports.all = (req, res, next) => {
-  loadDataAsJSON();
-  res.json(tasks);
+exports.all = async (req, res, next) => {
+  try {
+    await loadDataAsJSON();
+    res.json(tasks);
+  } catch (error) {
+    next(Object.assign(error, { message: 'Error reading data file' }));
+  }
 };
 
-exports.create = (req, res, next) => {
+exports.create = async (req, res, next) => {
   const { body } = req;
   const { description = '', author = '' } = body;
 
@@ -22,88 +26,120 @@ exports.create = (req, res, next) => {
     updated: '',
   };
 
-  loadDataAsJSON();
-  tasks.push(task);
-  saveDataAsJSON();
-
-  res.json(task);
+  try {
+    await loadDataAsJSON();
+    tasks.push(task);
+    await saveDataAsJSON();
+    res.json(task);
+  } catch (error) {
+    next(Object.assign(error, { message: 'Error reading data file' }));
+  }
 };
 
-exports.read = (req, res, next) => {
+exports.findById = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
 
-  loadDataAsJSON();
+  try {
+    await loadDataAsJSON();
+  } catch (error) {
+    next(Object.assign(error, { message: 'Error reading data file' }));
+  }
   const task = tasks.find((t) => t.id === id);
 
-  if (task === undefined) {
-    return next({
+  if (task) {
+    req.middleWare = { ...req.middleWare, taskFound: task };
+    next();
+  } else {
+    next({
       message: `Task with id '${id}' not found.`,
       statusCode: 404,
     });
   }
-
-  res.json(task);
 };
 
-exports.update = (req, res, next) => {
-  const { params = {}, body = {} } = req;
-  const { id = '' } = params;
-  const { description = '', author = '' } = body;
+exports.read = async (req, res, next) => {
+  const { middleWare = {} } = req;
+  const { taskFound } = middleWare;
 
-  loadDataAsJSON();
-  const taskIndex = tasks.findIndex((t) => t.id === id);
-
-  if (taskIndex < 0) {
-    return next({
-      message: `Task with id '${id}' not found.`,
-      statusCode: 404,
-    });
+  if (taskFound) {
+    res.json(taskFound);
   }
-  const task = tasks[taskIndex];
-
-  task.updated = new Date().toUTCString();
-  task.description = description;
-  task.author = author;
-
-  saveDataAsJSON();
-  res.json(task);
 };
 
-exports.delete = (req, res, next) => {
+exports.update = async (req, res, next) => {
+  const { body = {} } = req;
+  const { middleWare = {} } = req;
+  const { taskFound } = middleWare;
+
+  if (taskFound) {
+    const task = {
+      ...taskFound,
+      ...body,
+      id: taskFound.id,
+      updated: new Date().toUTCString(),
+    };
+    tasks[tasks.findIndex((x) => x.id === task.id)] = { ...task };
+
+    try {
+      await saveDataAsJSON();
+      res.json(task);
+    } catch (error) {
+      next(Object.assign(error, { message: 'Error reading data file' }));
+    }
+  }
+};
+
+exports.delete = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
 
-  loadDataAsJSON();
+  try {
+    await loadDataAsJSON();
+  } catch (error) {
+    next(Object.assign(error, { message: 'Error reading data file' }));
+  }
   const taskIndex = tasks.findIndex((x) => x.id === id);
 
-  if (taskIndex < 0) {
-    return next({
+  if (taskIndex >= 0) {
+    const task = tasks[taskIndex];
+    tasks.splice(taskIndex, 1);
+
+    try {
+      await saveDataAsJSON();
+      res.json(task);
+    } catch (error) {
+      next(Object.assign(error, { message: 'Error reading data file' }));
+    }
+  } else {
+    next({
       message: `Task with id '${id}' not found.`,
       statusCode: 404,
     });
   }
-
-  const task = tasks[taskIndex];
-  tasks.splice(taskIndex, 1);
-
-  saveDataAsJSON();
-  res.json(task);
 };
 
-const loadDataAsJSON = () => {
+const loadDataAsJSON = async () => {
   try {
-    const data = fs.readFileSync(dataFilePath, 'utf-8');
+    const data = await fs.readFile(dataFilePath, 'utf-8');
     tasks = JSON.parse(data);
   } catch (error) {
-    tasks = [];
+    throw Object.assign(
+      new Error("Data file path doesn't exist", {
+        statusCode: 500,
+      })
+    );
   }
 };
 
-const saveDataAsJSON = () => {
+const saveDataAsJSON = async () => {
   try {
-    fs.writeFileSync(dataFilePath, JSON.stringify(tasks, null, 4));
+    await fs.writeFile(dataFilePath, JSON.stringify(tasks, null, 4));
   } catch (error) {
-    console.log(error);
+    throw Object.assign(
+      new Error("Data file path doesn't exist", {
+        statusCode: 500,
+      })
+    );
   }
 };

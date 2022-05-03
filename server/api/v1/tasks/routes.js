@@ -6,6 +6,13 @@ const controller = require('./controller');
 
 router.route('/').get(controller.all).post(controller.create);
 
+router.param('id', controller.findById);
+// router
+//   .route('/:id')
+//   .get(controller.findById)
+//   .put(controller.findById)
+//   .delete(controller.findById);
+
 router
   .route('/:id')
   .get(controller.read)
