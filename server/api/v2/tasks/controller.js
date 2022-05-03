@@ -1,13 +1,13 @@
 // const config = require('../../../config');
-const { fields, Model } = require('./model');
+const { fields, Model, references } = require('./model');
 
 exports.all = async (req, res, next) => {
   try {
-    // const data = await Model.find({}).limit(limit).skip(skip).exec();
-    // const total = await Model.countDocuments();
+    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+
     const [total = 0, data = []] = await Promise.all([
       Model.countDocuments(),
-      Model.find({}).exec(),
+      Model.find({}).populate(populateFields).exec(),
     ]);
 
     res.json({ total, data });
@@ -28,7 +28,10 @@ exports.create = async (req, res, next) => {
   const document = new Model(task);
 
   try {
+    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+
     const data = await document.save();
+    data.populate(populateFields);
 
     res.status(201);
     res.json(data);
@@ -41,8 +44,9 @@ exports.findById = async (req, res, next) => {
   const { params = {} } = req;
   const { id } = params;
 
+  const populateFields = Object.getOwnPropertyNames(references).join(' ');
   try {
-    const data = await Model.findById(id).exec();
+    const data = await Model.findById(id).populate(populateFields).exec();
 
     if (data) {
       req.middleWare = { ...req.middleWare, taskFound: data };
@@ -85,9 +89,10 @@ exports.update = async (req, res, next) => {
     };
 
     try {
+      const populateFields = Object.getOwnPropertyNames(references).join(' ');
       const data = await Model.findByIdAndUpdate(taskFound.id, taskUpdated, {
         new: true,
-      });
+      }).populate(populateFields);
       res.json({
         data,
       });
@@ -102,7 +107,10 @@ exports.delete = async (req, res, next) => {
   const { taskFound } = middleWare;
 
   try {
-    const data = await Model.findByIdAndDelete(taskFound.id);
+    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+    const data = await Model.findByIdAndDelete(taskFound.id).populate(
+      populateFields
+    );
     res.json({
       data,
     });
