@@ -9,6 +9,20 @@ const config = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
   },
+  pagination: {
+    limit: 10,
+    skip: 0,
+  },
+  sort: {
+    sortBy: {
+      default: 'createdAt',
+      fields: ['createdAt', 'updatedAt'],
+    },
+    direction: {
+      default: 'desc',
+      options: ['desc', 'asc'],
+    },
+  },
 };
 
 module.exports = config;

@@ -1,16 +1,34 @@
-// const config = require('../../../config');
 const { fields, Model } = require('./model');
+const { paginationParseParams, sortParseParams } = require('./../../../utils');
 
 exports.all = async (req, res, next) => {
   try {
-    // const data = await Model.find({}).limit(limit).skip(skip).exec();
-    // const total = await Model.countDocuments();
+    const { query = {} } = req;
+    const { limit, skip } = paginationParseParams(query);
+    const { sortBy, direction } = sortParseParams(query, fields);
+
     const [total = 0, data = []] = await Promise.all([
       Model.countDocuments(),
-      Model.find({}).exec(),
+      Model.find({})
+        .skip(skip)
+        .limit(limit)
+        .sort({
+          [sortBy]: direction,
+        })
+        .exec(),
     ]);
 
-    res.json({ total, data });
+    res.json({
+      data,
+      meta: {
+        total,
+        limit,
+        skip,
+        total,
+        sortBy,
+        direction,
+      },
+    });
   } catch (error) {
     next(error);
   }
